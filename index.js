@@ -35,7 +35,33 @@ async function run() {
         res.send(result)
     })
 
+    app.post('/alldata', async(req,res)=>{
 
+      const formData = req.body;
+      const result = await mainCollection.insertOne(formData)
+    })
+
+    app.get('/alldata/:id', async (req, res) => {
+      try {
+          const tokenId = parseInt(req.params.id);
+  
+          if (isNaN(tokenId)) {
+              return res.status(400).json({ error: "Invalid Token ID." });
+          }
+  
+          const nft = await mainCollection.findOne({ tokenId });
+  
+          if (!nft) {
+              return res.status(404).json({ error: "NFT not found." });
+          }
+  
+          logger.info(`NFT Retrieved by ID: ${tokenId}`);
+          res.status(200).json(nft);
+      } catch (error) {
+          logger.error("Error fetching NFT:", error);
+          res.status(500).json({ error: "Internal server error." });
+      }
+  });
 
 
 
